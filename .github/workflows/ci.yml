@@ -1,0 +1,24 @@
+name: Verify demo
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: Start production build and run browser tests
+        run: |
+          npm run start &
+          npx wait-on@8.0.3 http://127.0.0.1:3000
+          npm run test:e2e
