@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { validateEnvironment } from "@/lib/config";
+export const dynamic = "force-dynamic";
 import { StoreProvider } from "@/components/store";
 export const metadata: Metadata = {
   title: "Numora SMS — Virtual numbers, made simple",
@@ -14,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <StoreProvider>{children}</StoreProvider>
+        <StoreProvider mode={validateEnvironment(process.env).mode}>
+          {children}
+        </StoreProvider>
       </body>
     </html>
   );

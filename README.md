@@ -67,16 +67,16 @@ See [architecture/threat model](docs/ARCHITECTURE.md) and [production checklist]
 
 ## 4. Configuration
 
-| Variable | Required for demo? | Meaning |
-|---|---|---|
-| `APP_MODE` | No | Defaults to `demo`; all other modes fail closed |
-| `NEXT_PUBLIC_BRAND_NAME` | No | Public display brand; never a secret |
-| `SMS_PROVIDER` | No | Reserved server-side provider selector |
-| `SMS_API_KEY` | No | Reserved server-side credential; unused |
-| `SMS_API_SECRET` | No | Reserved server-side credential; unused |
-| `SMS_WEBHOOK_SECRET` | No | Reserved server-side signature secret; unused |
-| `SUPABASE_URL` | No | Future server configuration; unused |
-| `SUPABASE_SERVICE_ROLE_KEY` | No | Future privileged server key; unused |
+| Variable                    | Required for demo? | Meaning                                         |
+| --------------------------- | ------------------ | ----------------------------------------------- |
+| `APP_MODE`                  | No                 | Defaults to `demo`; all other modes fail closed |
+| `NEXT_PUBLIC_BRAND_NAME`    | No                 | Public display brand; never a secret            |
+| `SMS_PROVIDER`              | No                 | Reserved server-side provider selector          |
+| `SMS_API_KEY`               | No                 | Reserved server-side credential; unused         |
+| `SMS_API_SECRET`            | No                 | Reserved server-side credential; unused         |
+| `SMS_WEBHOOK_SECRET`        | No                 | Reserved server-side signature secret; unused   |
+| `SUPABASE_URL`              | No                 | Future server configuration; unused             |
+| `SUPABASE_SERVICE_ROLE_KEY` | No                 | Future privileged server key; unused            |
 
 Only the brand is allowed a `NEXT_PUBLIC` variable. Never put secrets in browser JavaScript, Git, build logs, screenshots, error responses or public environment names. `.gitignore` excludes `.env*` except `.env.example`.
 
@@ -152,7 +152,31 @@ The local and remote commit hashes must match. The expected name is `numora-sms-
 
 If Arena later offers a GitHub connection, use its connected-app browser authorization flow and grant repository creation/write permission. This session cannot enable an unsupported connector by using the exposed token.
 
-## 8. Vercel deployment (prepared, not performed)
+## 8. Live mode: real numbers and real SMS (implemented, not yet verified end to end)
+
+`APP_MODE=live` switches the app from the simulator to server-side provider
+integrations. Demo data is never rendered in live mode: if a provider is
+unconfigured, you get a setup error, not fake numbers or messages.
+
+- **Twilio** (paid): country list, SMS-capable inventory search, account-specific
+  monthly price, real allocation, release, and inbound SMS history.
+- **TextBee** (free to start, your own Android phone + SIM): incoming SMS history
+  and signed webhooks. It cannot rent numbers.
+- **VirtualSMS**: investigated, not integrated (its public catalogue returned HTTP
+  403 from the build environment; it is a paid prepaid service).
+
+Exact variables, deploy steps, provider terms, costs and the real-SMS acceptance
+test are in **[docs/LIVE-SETUP.md](docs/LIVE-SETUP.md)**.
+
+```bash
+node scripts/operator-password.mjs   # create OPERATOR_PASSWORD_HASH from stdin
+APP_MODE=live npm run dev            # requires APP_URL, AUTH_SECRET, OPERATOR_PASSWORD_HASH
+```
+
+No live allocation or inbound SMS has been verified yet: no provider account, API
+key or SIM was available during implementation.
+
+## 9. Vercel deployment (prepared, not performed)
 
 The Arena Vercel connector is supported but currently **disconnected**. Connect Vercel through Arena’s connected-apps browser authorization interface if you want to authorize deployment from this chat. Do not paste a Vercel token. The manual workflow below works after publishing the repository.
 
@@ -187,7 +211,7 @@ No Vercel token should be pasted into chat, committed or stored in browser code.
 - **Vercel build fails:** inspect build logs for Node version or invalid mode. Default Next.js build settings are sufficient; no backend credentials are required.
 - **Webhook/payment returns 503:** intentional. No live integration is configured. Do not treat this as an error to bypass.
 
-## 9. Remaining accounts, resources and approvals
+## 10. Remaining accounts, resources and approvals
 
 **For local use:** none besides a Node-capable device. Internet access is needed once to install packages/browser binaries.
 

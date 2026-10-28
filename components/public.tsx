@@ -15,7 +15,8 @@ import { money } from "@/lib/demo";
 import { Logo } from "./app";
 import { Badge, DemoNotice } from "./ui";
 export function PublicPage({ path }: { path: string }) {
-  const { state } = useStore();
+  const { state, mode } = useStore();
+  if (mode === "live") return <LivePublic path={path} />;
   const isHome = path === "/";
   return (
     <div className="public-shell">
@@ -555,4 +556,83 @@ function Document({ path }: { path: string }) {
 }
 function cmdGap() {
   return "";
+}
+
+function LivePublic({ path }: { path: string }) {
+  return (
+    <div className="public-shell">
+      <header className="public-nav">
+        <Logo />
+        <nav>
+          <Link href="/docs">Documentation</Link>
+          <Link className="btn secondary" href="/dashboard">
+            Operator sign-in <ArrowRight size={15} />
+          </Link>
+        </nav>
+      </header>
+      <main className="public-container public-document prose">
+        <Badge>LIVE PROVIDER MODE</Badge>
+        <h1>
+          {path === "/docs"
+            ? "Connect real SMS resources."
+            : "Your numbers. Your private workspace."}
+        </h1>
+        <p className="lead">
+          Live mode contains no sample inventory, messages, credits or simulated
+          allocation. Access to real phone numbers and private SMS requires
+          operator authentication and server-configured provider credentials.
+        </p>
+        <h2>Android SIM: TextBee</h2>
+        <p>
+          Use your own compatible Android phone and active SIM. Register it with
+          TextBee, enable incoming SMS, then configure TEXTBEE_API_KEY and
+          TEXTBEE_DEVICE_ID on the server. TextBee cannot provision rental
+          numbers or create multi-country inventory.
+        </p>
+        <h2>Multi-country provisioning: Twilio</h2>
+        <p>
+          Configure TWILIO_ACCOUNT_SID, TWILIO_API_KEY and TWILIO_API_SECRET.
+          The country selector, available-number search and account-specific
+          monthly pricing use Twilio APIs. Real allocation requires an eligible
+          funded account and LIVE_PURCHASE_ENABLED=true. Number charges, SMS
+          usage, taxes and country-specific compliance may apply. No free-number
+          guarantee is made.
+        </p>
+        <h2>Server authentication</h2>
+        <p>
+          Set APP_MODE=live, APP_URL to this deployment’s canonical HTTPS
+          origin, a random AUTH_SECRET of at least 32 characters, and
+          OPERATOR_PASSWORD_HASH generated with scripts/operator-password.mjs.
+          Never enter provider credentials in a frontend form or NEXT_PUBLIC
+          variable. See docs/LIVE-SETUP.md in the repository for exact setup and
+          a real-SMS acceptance test.
+        </p>
+        <h2>Optional signed webhooks</h2>
+        <p>
+          Inbox Refresh reads authenticated provider history without requiring a
+          database. To accept webhook receipts, apply the webhook_receipts SQL
+          migration, configure server-only Supabase credentials, set
+          LIVE_WEBHOOKS_ENABLED=true, and add TWILIO_AUTH_TOKEN or
+          TEXTBEE_WEBHOOK_SECRET as appropriate. Endpoints: /api/webhooks/twilio
+          and /api/webhooks/textbee. Signatures are verified before durable
+          event deduplication. No message contents are stored in receipt
+          records.
+        </p>
+        <h2>Scope, privacy and billing</h2>
+        <p>
+          This live integration is for one trusted account operator—not public
+          customer resale. Real provider messages remain with the provider and
+          appear in browser memory only. No customer deposits, fake balance,
+          simulated refund, automatic expiration or universal verification-code
+          support is offered. Twilio allocations continue billing until
+          explicitly released. Review provider terms, telecom regulations,
+          retention and privacy requirements before use. Existing legal
+          templates are not sufficient approval for a live commercial service.
+        </p>
+        <Link className="btn" href="/dashboard">
+          Open private workspace <ArrowRight size={16} />
+        </Link>
+      </main>
+    </div>
+  );
 }

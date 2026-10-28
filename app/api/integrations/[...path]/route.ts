@@ -1,3 +1,4 @@
+import { validateEnvironment } from "@/lib/config";
 import { NextRequest, NextResponse } from "next/server";
 // Fail closed: no live adapter, sessions or webhook verifier is installed.
 // Never parse, retain or log message bodies or credentials here.
@@ -17,8 +18,11 @@ export async function POST(request: NextRequest) {
 }
 export async function GET() {
   return NextResponse.json({
-    mode: "demo",
-    database: "browser-local",
+    mode: validateEnvironment(process.env).mode,
+    database:
+      validateEnvironment(process.env).mode === "demo"
+        ? "browser-local"
+        : "provider-authoritative",
     sms: "not configured",
     payments: "disabled",
     authentication: "not configured",

@@ -1,9 +1,13 @@
 export const brand = process.env.NEXT_PUBLIC_BRAND_NAME || "Numora SMS";
-export function validateEnvironment(env: Record<string, string | undefined>) {
-  const mode = env.APP_MODE || "demo";
-  if (mode !== "demo")
+export type AppMode = "demo" | "live";
+export function validateEnvironment(env: Record<string, string | undefined>): {
+  mode: AppMode;
+} {
+  const mode =
+    env.APP_MODE || (env.VERCEL_ENV === "production" ? "live" : "demo");
+  if (mode !== "demo" && mode !== "live")
     throw new Error(
-      "Live operation is not implemented. Use APP_MODE=demo. Production requires verified adapters, server authorization and a reviewed database.",
+      "Invalid APP_MODE: use demo or live. Other modes are not implemented.",
     );
-  return { mode: "demo" as const };
+  return { mode };
 }

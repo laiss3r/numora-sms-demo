@@ -86,3 +86,32 @@ describe("future SQL foundation (local PostgreSQL engine, mock auth)", () => {
     }
   });
 });
+
+it("applies optional webhook receipt migration with service-only idempotent insertion", async () => {
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/202610280002_webhook_receipts.sql",
+      "utf8",
+    ),
+  );
+  await db.exec("set role service_role");
+  try {
+    await db.exec(
+      `insert into webhook_receipts(provider,event_id,payload_digest) values('textbee','fixture-event',repeat('a',64)) on conflict(provider,event_id) do nothing;insert into webhook_receipts(provider,event_id,payload_digest) values('textbee','fixture-event',repeat('a',64)) on conflict(provider,event_id) do nothing;`,
+    );
+    const r = await db.query<{ count: number }>(
+      `select count(*)::int as count from webhook_receipts`,
+    );
+    expect(r.rows[0].count).toBe(1);
+  } finally {
+    await db.exec("reset role");
+  }
+  await db.exec("set role authenticated");
+  try {
+    await expect(db.exec("select * from webhook_receipts")).rejects.toThrow(
+      "permission denied",
+    );
+  } finally {
+    await db.exec("reset role");
+  }
+});

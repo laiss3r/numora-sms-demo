@@ -31,6 +31,7 @@ import {
   SettingsPage,
 } from "./customer";
 import { PublicPage } from "./public";
+import { LiveWorkspace } from "./live";
 import { Admin } from "./admin";
 const links = [
   ["/dashboard", "Overview", LayoutDashboard],
@@ -79,7 +80,9 @@ export function App() {
           <span className="workspace-icon">N</span>
           <div>
             <strong>Personal workspace</strong>
-            <small>Demo account</small>
+            <small>
+              {s.mode === "live" ? "Private operator account" : "Demo account"}
+            </small>
           </div>
           <ChevronsUpDown size={15} />
         </div>
@@ -115,8 +118,10 @@ export function App() {
             className={path.startsWith("/admin") ? "active" : ""}
           >
             <ShieldCheck size={19} />
-            <span>Demo admin</span>
-            <span className="tiny-tag">LOCAL</span>
+            <span>{s.mode === "live" ? "Integrations" : "Demo admin"}</span>
+            <span className="tiny-tag">
+              {s.mode === "live" ? "LIVE" : "LOCAL"}
+            </span>
           </Link>
           <Link href="/docs">
             <BookOpen size={19} />
@@ -129,14 +134,23 @@ export function App() {
             <span className="sandbox-icon">
               <Radio size={19} />
             </span>
-            <strong>Your sandbox. Your rules.</strong>
+            <strong>
+              {s.mode === "live"
+                ? "Your provider. Your account."
+                : "Your sandbox. Your rules."}
+            </strong>
             <p>
-              Try the full experience.
+              {s.mode === "live"
+                ? "Real provider APIs."
+                : "Try the full experience."}
               <br />
-              No real numbers or charges.
+              {s.mode === "live"
+                ? "Charges may apply."
+                : "No real numbers or charges."}
             </p>
             <Link href="/docs">
-              About demo mode <ArrowUpRight size={14} />
+              {s.mode === "live" ? "Integration setup" : "About demo mode"}{" "}
+              <ArrowUpRight size={14} />
             </Link>
           </div>
           <div className="side-profile">
@@ -178,7 +192,7 @@ export function App() {
               Help & documentation <ExternalLink size={13} />
             </Link>
             <span className="top-demo">
-              <i /> Demo workspace
+              <i /> {s.mode === "live" ? "Live workspace" : "Demo workspace"}
             </span>
             <Link
               href="/dashboard/inbox"
@@ -200,6 +214,8 @@ export function App() {
               <div />
               <div />
             </div>
+          ) : s.mode === "live" ? (
+            <LiveWorkspace key={path} path={path} />
           ) : path === "/dashboard" ? (
             <Dashboard />
           ) : path === "/dashboard/numbers" ? (
@@ -223,7 +239,10 @@ export function App() {
           <footer className="dashboard-footer">
             <span>© 2026 {brand}. Built for exploration.</span>
             <span>
-              <i /> Demo systems operational{" "}
+              <i />{" "}
+              {s.mode === "live"
+                ? "Provider-backed mode"
+                : "Demo systems operational"}{" "}
               <span className="footer-divider">|</span>
               <Link href="/privacy">Privacy</Link>
               <Link href="/terms">Terms</Link>
