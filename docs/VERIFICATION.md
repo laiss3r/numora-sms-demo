@@ -40,7 +40,7 @@ Browser tests run both desktop and an iPhone-sized Chromium viewport (not Safari
 
 1. GitHub connector lookup returned `unsupported`. There was no GitHub CLI or privately supplied GitHub token environment in this execution environment. A leaked screenshot token was neither read into a credential store nor used. **Revoke it.**
 2. No authorized GitHub identity is known; no real repository URL, remote default branch or pushed commit can be reported. README section 7 gives secure browser/device authorization steps on the user's computer.
-3. No Vercel account is authorized. No Vercel project/deployment or public URL was created. The active Arena preview is only a sandbox preview, not a Vercel deployment.
+3. The Vercel connector lookup returned `disconnected`. Connect Vercel in Arena’s connected-apps interface to authorize deployment; do not paste a token. No Vercel account is authorized. No Vercel project/deployment or public URL was created. The active Arena preview is only a sandbox preview, not a Vercel deployment.
 4. No production SMS provider, payment provider, authentication service or real backend is configured. Live mode deliberately fails closed.
 
 The user's full completion condition (source pushed to authorized GitHub) is therefore **not yet satisfied**, despite a working and tested demo. Local commits and downloadable source are supplied to avoid losing completed work.

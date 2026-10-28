@@ -154,6 +154,8 @@ If Arena later offers a GitHub connection, use its connected-app browser authori
 
 ## 8. Vercel deployment (prepared, not performed)
 
+The Arena Vercel connector is supported but currently **disconnected**. Connect Vercel through Arena’s connected-apps browser authorization interface if you want to authorize deployment from this chat. Do not paste a Vercel token. The manual workflow below works after publishing the repository.
+
 1. Publish to GitHub using the steps above.
 2. Sign in to [Vercel](https://vercel.com/) through its website. Use Hobby only if this is a personal, non-commercial demo eligible under its terms.
 3. **Add New → Project → Import Git Repository**. Authorize Vercel’s GitHub App for this repository, select `numora-sms-demo`.
